@@ -1,11 +1,26 @@
 mod operations;
 use core::fmt;
-use operations::{generate_operations, Operation};
-use std::collections::HashMap;
+use operations::OPERATIONS;
 
+/// Struct holding Calculator state. Stack is a vector representing stack of numbers.
+/// Operations represents all possible operations on that stack, defined in [`operations.rs`]: calculator/operations.rs
+/// Should be accessed through the implemented methods
+/// 
+/// # Example
+/// 
+/// ```rust
+/// # use calculator::Calculator;
+/// # fn main() -> () {
+/// let mut calc = Calculator::new();
+/// calc.push(1.0);
+/// calc.push(2.0);
+/// calc.perform_operation("+");
+/// let result = calc.pop().unwrap();
+/// assert_eq!(1.0+2.0, result)
+/// # }
+/// ```
 pub struct Calculator {
     stack: Vec<f64>,
-    operations: HashMap<&'static str, Operation>,
 }
 
 impl fmt::Debug for Calculator {
@@ -15,13 +30,33 @@ impl fmt::Debug for Calculator {
 }
 
 impl Calculator {
+    /// Create a new Calculator struct with an empty stack and operations from [`operations.rs`]: calculator/operations.rs
+    /// It would be nice to have operations defined as a static list at compile time. TODO
+    /// 
+    /// # Example
+    /// ```rust
+    /// # use calculator::Calculator;
+    /// # fn main() -> () {
+    /// let mut calc = Calculator::new();
+    /// # }
+    /// ```
     pub fn new() -> Calculator {
         Calculator {
             stack: Vec::new(),
-            operations: generate_operations(),
         }
     }
 
+    /// Get the top item from the stack. Direct passthrough of std::Vec pop method.
+    /// 
+    /// # Example
+    /// ```rust
+    /// # use calculator::Calculator;
+    /// # fn main() -> () {
+    /// let mut calc = Calculator::new();
+    /// calc.push(1.0);
+    /// calc.pop();
+    /// # }
+    /// ```
     pub fn pop(&mut self) -> Option<f64> {
         self.stack.pop()
     }
@@ -31,7 +66,7 @@ impl Calculator {
     }
 
     pub fn perform_operation(&mut self, operation_str: &str) -> Result<(), &'static str> {
-        let op = match self.operations.get(operation_str) {
+        let op = match OPERATIONS.get(operation_str) {
             None => {
                 return Err("Specified operation does not exist!");
             }
